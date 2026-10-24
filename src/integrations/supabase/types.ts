@@ -14,7 +14,147 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          avg_hr: number | null
+          avg_power: number | null
+          distance_m: number
+          duration_s: number
+          elevation_m: number | null
+          id: string
+          name: string
+          sport: string
+          started_at: string
+          training_load: number | null
+          user_id: string
+        }
+        Insert: {
+          avg_hr?: number | null
+          avg_power?: number | null
+          distance_m?: number
+          duration_s?: number
+          elevation_m?: number | null
+          id: string
+          name: string
+          sport: string
+          started_at: string
+          training_load?: number | null
+          user_id: string
+        }
+        Update: {
+          avg_hr?: number | null
+          avg_power?: number | null
+          distance_m?: number
+          duration_s?: number
+          elevation_m?: number | null
+          id?: string
+          name?: string
+          sport?: string
+          started_at?: string
+          training_load?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      garmin_connections: {
+        Row: {
+          encrypted_key: string
+          expires_at: string | null
+          last_sync_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          encrypted_key: string
+          expires_at?: string | null
+          last_sync_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          encrypted_key?: string
+          expires_at?: string | null
+          last_sync_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "garmin_connections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          display_name: string
+          ftp: number
+          id: string
+          max_hr: number
+          resting_hr: number
+        }
+        Insert: {
+          display_name?: string
+          ftp?: number
+          id: string
+          max_hr?: number
+          resting_hr?: number
+        }
+        Update: {
+          display_name?: string
+          ftp?: number
+          id?: string
+          max_hr?: number
+          resting_hr?: number
+        }
+        Relationships: []
+      }
+      wellness: {
+        Row: {
+          day: string
+          hrv: number | null
+          resting_hr: number | null
+          sleep_seconds: number | null
+          stress: number | null
+          user_id: string
+        }
+        Insert: {
+          day: string
+          hrv?: number | null
+          resting_hr?: number | null
+          sleep_seconds?: number | null
+          stress?: number | null
+          user_id: string
+        }
+        Update: {
+          day?: string
+          hrv?: number | null
+          resting_hr?: number | null
+          sleep_seconds?: number | null
+          stress?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wellness_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
