@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { demoActivities, demoWellness, trainingTrend } from '@/lib/training';
+import { activityDays, demoActivities, demoWellness, periodActivities, sportStatistics, trainingTrend } from '@/lib/training';
 
 describe('Training data mapping', () => {
+  it('filters the selected period and keeps charts and sport totals consistent', () => {
+    const rows = periodActivities(demoActivities(), '2026-10-24', 7);
+    expect(rows).toHaveLength(6);
+    const stats = sportStatistics(rows);
+    const daily = activityDays(rows, '2026-10-24', 7);
+    expect(daily.reduce((sum, day) => sum + day.distance, 0)).toBeCloseTo(stats.distance);
+    expect(daily.reduce((sum, day) => sum + day.hours, 0)).toBeCloseTo(stats.hours);
+    expect(sportStatistics([]).pace).toBeNull();
+    expect(sportStatistics([]).power).toBeNull();
+  });
   it('maps every demo activity to a defined name and numeric metrics', () => {
     const activities = demoActivities();
     expect(activities).toHaveLength(68);
