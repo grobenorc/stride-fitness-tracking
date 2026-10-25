@@ -1,6 +1,5 @@
 # Training app
-- [ ] Fix remaining dashboard/data TypeScript errors and verify preview loads.
-- [ ] Private sign-in and saved athlete profile / zones.
-- [ ] Garmin Personal API connection and secure key replacement.
-- [ ] Training dashboard, activity history, recovery and data export.
-- [ ] Validate app flows; real Garmin sync needs the user's key.
+- [x] Fix remaining dashboard/data TypeScript errors and verify preview loads (build OK; 3 tests passed; dashboard, activities and settings checked).
+- [ ] Verify private sign-in and saved profile with an authenticated user session.
+- [ ] Verify Garmin connection, sync and key replacement with the user's key.
+- [ ] Finish dashboard presentation and remaining training insights (outside the TypeScript-fix request).
