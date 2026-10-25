@@ -1,0 +1,15 @@
+import { describe, expect, it } from 'vitest';
+import { bestCurve, environment, filterSport, recordingMetrics, zoneDistribution, type Recording } from '@/lib/sport-analysis';
+import { demoActivities } from '@/lib/training';
+import { readFit } from '@/lib/fit-import';
+function recording():Recording {const activity=demoActivities()[0];if(!activity)throw new Error('Missing fixture');return {activity,samples:Array.from({length:60},(_,second)=>({second,power:200,hr:140,speed:3,cadence:80}))};}
+describe('Deep sport analysis',()=>{
+ it('filters indoor and outdoor cycling by explicit subtype, not activity name',()=>{const a=recording().activity;const rows=[{...a,id:'a',sport:'indoor_cycling'},{...a,id:'b',sport:'road_biking'},{...a,id:'c',sport:'cycling',name:'Indoor ride'}];expect(filterSport(rows,'Cycling','Indoor').map(r=>r.id)).toEqual(['a']);expect(filterSport(rows,'Cycling','Outdoor').map(r=>r.id)).toEqual(['b']);expect(environment(rows[2]??a)).toBe('Unknown');});
+ it('includes skiing as a separate sport',()=>{expect(filterSport([{...recording().activity,sport:'cross_country_skiing'}],'Skiing','All')).toHaveLength(1);});
+ it('computes observed power curves and excludes durations longer than recorded data',()=>{const curve=bestCurve([recording()],'power');expect(curve.find(p=>p.duration===60)?.value).toBe(200);expect(curve.find(p=>p.duration===180)?.value).toBeNull();});
+ it('never bridges gaps or missing measurements in best effort windows',()=>{const r=recording();r.samples=r.samples.map(s=>({...s,second:s.second<30?s.second:s.second+10}));expect(bestCurve([r],'power').find(p=>p.duration===60)?.value).toBeNull();r.samples[2]={second:2,power:null,hr:null,speed:null,cadence:null};expect(bestCurve([r],'power').find(p=>p.duration===30)?.value).toBe(200);});
+ it('calculates power zone time from samples and FTP, not average power',()=>{const result=zoneDistribution([recording()],'power',250);expect(result.measured).toBe(60);expect(result.zones.find(z=>z.zone==='Z3')?.seconds).toBe(60);expect(zoneDistribution([recording()],'power',null).measured).toBe(0);});
+ it('calculates HR zone time from maximum HR and excludes missing HR',()=>{const r=recording();const first=r.samples[0];if(first)first.hr=null;const z=zoneDistribution([r],'hr',200);expect(z.measured).toBe(59);expect(z.zones.find(v=>v.zone==='Z3')?.seconds).toBe(59);});
+ it('calculates normalized power, intensity, variability and work from constant power',()=>{const m=recordingMetrics(recording(),250);expect(m.np).toBeCloseTo(200);expect(m.intensity).toBeCloseTo(0.8);expect(m.variability).toBeCloseTo(1);expect(m.work).toBeCloseTo(12);});
+ it('rejects non-FIT uploads',async()=>{await expect(readFit(new ArrayBuffer(100),'invalid.fit')).rejects.toThrow();});
+});
