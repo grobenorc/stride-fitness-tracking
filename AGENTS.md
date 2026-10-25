@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep dashboard data mappings safe under strict indexed access: provide fallbacks for indexed lookups and use fixed tuples for paired numeric ranges so rendering never receives undefined.
