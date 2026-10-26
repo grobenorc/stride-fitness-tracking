@@ -1,4 +1,5 @@
 # Training app
+- [ ] Implement individual Strava/Garmin account connections, secure sync and connection management.
 - [x] Add deep cycling, running and skiing analysis, indoor/outdoor comparison, sample-based curves and zones, and further analysis suggestions; tested calculations, FIT import and desktop/mobile sport navigation.
 - [x] Fix remaining dashboard/data TypeScript errors and verify preview loads (build OK; 3 tests passed; dashboard, activities and settings checked).
 - [ ] Verify private sign-in and saved profile with an authenticated user session (blocked: no account matches the requesting user; preview sign-in required).
