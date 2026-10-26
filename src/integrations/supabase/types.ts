@@ -23,6 +23,8 @@ export type Database = {
           elevation_m: number | null
           id: string
           name: string
+          source: string
+          source_id: string | null
           sport: string
           started_at: string
           training_load: number | null
@@ -36,6 +38,8 @@ export type Database = {
           elevation_m?: number | null
           id: string
           name: string
+          source?: string
+          source_id?: string | null
           sport: string
           started_at: string
           training_load?: number | null
@@ -49,6 +53,8 @@ export type Database = {
           elevation_m?: number | null
           id?: string
           name?: string
+          source?: string
+          source_id?: string | null
           sport?: string
           started_at?: string
           training_load?: number | null
@@ -117,6 +123,54 @@ export type Database = {
           id?: string
           max_hr?: number
           resting_hr?: number
+        }
+        Relationships: []
+      }
+      strava_connections: {
+        Row: {
+          athlete_id: string
+          encrypted_tokens: string
+          expires_at: string
+          last_sync_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          athlete_id: string
+          encrypted_tokens: string
+          expires_at: string
+          last_sync_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          athlete_id?: string
+          encrypted_tokens?: string
+          expires_at?: string
+          last_sync_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      training_oauth_states: {
+        Row: {
+          expires_at: string
+          redirect_uri: string
+          state_hash: string
+          user_id: string
+        }
+        Insert: {
+          expires_at: string
+          redirect_uri: string
+          state_hash: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string
+          redirect_uri?: string
+          state_hash?: string
+          user_id?: string
         }
         Relationships: []
       }
