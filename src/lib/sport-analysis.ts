@@ -64,7 +64,7 @@ export function recordingMetrics(recording: Recording, ftp:number|null) {
  let fourth=0,count=0,sum=0,start=0;
  for(let i=0;i<samples.length;i++){
   const s=samples[i];if(!s)continue;const prev=samples[i-1];
-  if(s.power===null || s.power<0 || (prev && s.second-prev.second!==1)){sum=0;start=i;if(s.power===null||s.power<0){start=i+1;continue;}}
+  if(s.power===null || !Number.isFinite(s.power) || s.power<0 || (prev && s.second-prev.second!==1)){sum=0;start=i;if(s.power===null||!Number.isFinite(s.power)||s.power<0){start=i+1;continue;}}
   sum+=s.power;
   if(i-start+1>30){sum-=samples[start]?.power??0;start++;}
   if(i-start+1===30){fourth+=(sum/30)**4;count++;}
@@ -73,7 +73,8 @@ export function recordingMetrics(recording: Recording, ftp:number|null) {
  const midpoint=((samples[0]?.second??0)+(samples.at(-1)?.second??0))/2;
  const ratio=(secondHalf:boolean)=>{const paired=samples.filter(s=>(s.second>=midpoint)===secondHalf&&s.power!==null&&s.hr!==null&&(s.hr??0)>0);const hr=paired.reduce((v,s)=>v+(s.hr??0),0);return hr&&paired.length?paired.reduce((v,s)=>v+(s.power??0),0)/hr:null;};
  const first=ratio(false),last=ratio(true);
- return {mean,np,intensity:np!==null&&ftp&&ftp>0?np/ftp:null,variability:np!==null&&mean&&mean>0?np/mean:null,drift:first&&last!==null?(1-last/first)*100:null,work:powers.length?powers.reduce((a,b)=>a+b,0)/1000:null};
+ const work=samples.reduce((total,s,i)=>{const next=samples[i+1];const seconds=next?next.second-s.second:1;return s.power!==null&&Number.isFinite(s.power)&&s.power>=0&&seconds>0&&seconds<=10?total+s.power*seconds:total;},0);
+ return {mean,np,intensity:np!==null&&ftp&&ftp>0?np/ftp:null,variability:np!==null&&mean&&mean>0?np/mean:null,drift:first&&last!==null?(1-last/first)*100:null,work:powers.length?work/1000:null};
 }
 export function demoRecording(activity: Activity): Recording {
  const length=Math.min(7200,Math.floor(activity.duration_s));
