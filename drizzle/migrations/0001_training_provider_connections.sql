@@ -1,0 +1,10 @@
+CREATE TABLE public.strava_connections (user_id uuid PRIMARY KEY, encrypted_tokens text NOT NULL, athlete_id text NOT NULL, expires_at timestamptz NOT NULL, last_sync_at timestamptz, status text NOT NULL DEFAULT 'connected');
+GRANT ALL ON public.strava_connections TO service_role;
+ALTER TABLE public.strava_connections ENABLE ROW LEVEL SECURITY;
+CREATE TABLE public.training_oauth_states (state_hash text PRIMARY KEY, user_id uuid NOT NULL, expires_at timestamptz NOT NULL, redirect_uri text NOT NULL);
+GRANT ALL ON public.training_oauth_states TO service_role;
+ALTER TABLE public.training_oauth_states ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.activities ADD COLUMN source text NOT NULL DEFAULT 'garmin';
+ALTER TABLE public.activities ADD COLUMN source_id text;
+UPDATE public.activities SET source_id=id WHERE source_id IS NULL;
+CREATE UNIQUE INDEX activities_provider_identity ON public.activities(user_id,source,source_id);
