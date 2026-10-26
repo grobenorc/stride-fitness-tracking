@@ -12,4 +12,13 @@ describe('Deep sport analysis',()=>{
  it('calculates HR zone time from maximum HR and excludes missing HR',()=>{const r=recording();const first=r.samples[0];if(first)first.hr=null;const z=zoneDistribution([r],'hr',200);expect(z.measured).toBe(59);expect(z.zones.find(v=>v.zone==='Z3')?.seconds).toBe(59);});
  it('calculates normalized power, intensity, variability and work from constant power',()=>{const m=recordingMetrics(recording(),250);expect(m.np).toBeCloseTo(200);expect(m.intensity).toBeCloseTo(0.8);expect(m.variability).toBeCloseTo(1);expect(m.work).toBeCloseTo(12);});
  it('rejects non-FIT uploads',async()=>{await expect(readFit(new ArrayBuffer(100),'invalid.fit')).rejects.toThrow();});
+ it('reads measured power, HR and indoor classification from a Garmin FIT recording',async()=>{
+  const {Encoder}=await import('@garmin/fitsdk');const encoder=new Encoder();const start=new Date('2026-10-24T15:00:00Z');
+  encoder.onMesg(0,{type:'activity',manufacturer:'garmin',product:1,serialNumber:123,timeCreated:start});
+  for(let i=0;i<60;i++)encoder.onMesg(20,{timestamp:new Date(start.getTime()+i*1000),power:200,heartRate:140,speed:8,cadence:85,distance:i*8});
+  encoder.onMesg(18,{timestamp:new Date(start.getTime()+60000),startTime:start,sport:'cycling',subSport:'indoorCycling',totalTimerTime:60,totalDistance:480,avgPower:200,avgHeartRate:140});
+  const bytes=encoder.close();const buffer=new ArrayBuffer(bytes.length);new Uint8Array(buffer).set(bytes);const r=await readFit(buffer,'test.fit');
+  expect(environment(r.activity)).toBe('Indoor');expect(r.activity.started_at).toBe('2026-10-24T15:00:00.000Z');expect(r.samples).toHaveLength(60);expect(r.samples[0]?.power).toBe(200);expect(r.samples[0]?.hr).toBe(140);expect(bestCurve([r],'power').find(p=>p.duration===60)?.value).toBe(200);expect(zoneDistribution([r],'power',250).zones[2]?.seconds).toBe(60);
+ });
+ it('integrates recorded work over sample intervals without bridging long gaps',()=>{const r=recording();r.samples=[{second:0,power:200,hr:140,speed:3,cadence:80},{second:5,power:200,hr:140,speed:3,cadence:80},{second:25,power:200,hr:140,speed:3,cadence:80}];expect(recordingMetrics(r,250).work).toBeCloseTo(1.2);});
 });
