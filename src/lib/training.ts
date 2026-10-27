@@ -1,4 +1,4 @@
-export type Activity = { id: string; name: string; sport: string; started_at: string; distance_m: number; duration_s: number; avg_hr: number | null; avg_power: number | null; elevation_m: number | null; training_load: number | null };
+export type Activity = { id: string; name: string; sport: string; started_at: string; distance_m: number; duration_s: number; avg_hr: number | null; avg_power: number | null; elevation_m: number | null; training_load: number | null; source?:string; source_id?:string|null };
 export type Wellness = { day: string; sleep_seconds: number | null; resting_hr: number | null; hrv: number | null; stress: number | null };
 export function sportName(value: string) { return /cycl|bik/.test(value.toLowerCase()) ? 'Cycling' : /run/.test(value.toLowerCase()) ? 'Running' : /ski/.test(value.toLowerCase()) ? 'Skiing' : 'Other'; }
 export function keyStatus(expiry: string | null, now: number = Date.now()) { if (!expiry) return 'unknown'; const days = (new Date(expiry).getTime() - now) / 86400000; return days <= 0 ? 'expired' : days <= 14 ? 'expiring' : 'active'; }
