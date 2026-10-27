@@ -14,3 +14,5 @@
 - Keep the graph-led dashboard and account settings in separate components; calculate selected-period and sport summaries in the client-safe training module to share filtering consistently across charts and tables.
 - Keep sample-level sport analytics in a client-safe analysis module and decode user-selected FIT recordings with a dynamically loaded Garmin SDK; recordings remain session-local until explicit account persistence is implemented.
 - Calculate power curves only from contiguous measured one-second windows and classify environments from explicit activity subtypes; never infer zones, curves or indoor/outdoor setting from session averages or activity names.
+- Training provider credentials and single-use OAuth states are server-only and user-scoped; Strava uses custom read-only OAuth because no matching App User Connector exists, while Garmin uses personal keys.
+- Preserve provider-native activity identities in storage, and deduplicate cross-provider matches before all dashboard aggregations, preferring Garmin without discarding original provider rows.
